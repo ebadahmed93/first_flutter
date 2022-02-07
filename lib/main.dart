@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter First  '),
+      home: const MyHomePage(title: 'Calculator App'),
     );
   }
 }
@@ -48,17 +49,106 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  String result = "0", history = "";
+  bool isThemeBlack = false;
+  String dummyResult = "0", operand = "";
+  double value1 = 0.0, value2 = 0.0;
 
-  void _incrementCounter() {
+  String iconText = "Dark";
+
+  Widget buildNumberButton(String text) {
+    return Expanded(
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: isThemeBlack ? Colors.black26 : Colors.white,
+              shape: const CircleBorder(),
+              padding: const EdgeInsets.all(25),
+            ),
+            onPressed: () => btnPressed(text),
+            child: Text(text,
+                style: TextStyle(
+                    fontSize: 26,
+                    color: isThemeBlack ? Colors.white : Colors.black))));
+  }
+
+  Widget buildFunctionButton(String text, bool isDmas) {
+    return Expanded(
+        child: MaterialButton(
+            color: isThemeBlack ? Colors.black26 : Colors.white,
+            padding: const EdgeInsets.all(25),
+            shape: const CircleBorder(),
+            onPressed: () => btnPressed(text),
+            child: Text(text,
+                style: TextStyle(
+                    fontSize: 26,
+                    color: isDmas
+                        ? Colors.orangeAccent
+                        : isThemeBlack
+                            ? Colors.white60
+                            : Colors.black26))));
+  }
+
+  btnPressed(String text) {
+    if (text == "AC") {
+      dummyResult = "0";
+      value1 = value2 = 0.0;
+      operand = history = "";
+    } else if (text == "%") {
+      value1 = double.parse(result);
+      dummyResult = (value1 / 100).toString();
+      history = value1.toString() + "/100";
+      value1 = value2 = 0.0;
+      operand = "";
+    } else if (text == "+/-") {
+      value1 = double.parse(result);
+      dummyResult = (value1 * (-1)).toString();
+      history = value1.toString() + "*(-1)";
+      value1 = value2 = 0.0;
+      operand = "";
+    } else if (text == "/" || text == "*" || text == "-" || text == "+") {
+      value1 = double.parse(result);
+      operand = text;
+      dummyResult = "0";
+    } else if (text == ".") {
+      if (dummyResult.contains('.')) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Already contain a decimal"),
+        ));
+      } else {
+        dummyResult = dummyResult + text;
+      }
+    } else if (text == "=") {
+      value2 = double.parse(result);
+      if (operand == "/") {
+        dummyResult = (value1 / value2).toString();
+        history = value1.toString() + operand + value2.toString();
+      } else if (operand == "*") {
+        dummyResult = (value1 * value2).toString();
+        history = value1.toString() + operand + value2.toString();
+      } else if (operand == "-") {
+        dummyResult = (value1 - value2).toString();
+        history = value1.toString() + operand + value2.toString();
+      } else if (operand == "+") {
+        dummyResult = (value1 + value2).toString();
+        history = value1.toString() + operand + value2.toString();
+      }
+
+      value1 = value2 = 0.0;
+      operand = "";
+    } else {
+      dummyResult = dummyResult + text;
+    }
+    if (kDebugMode) {
+      print(dummyResult);
+    }
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      result = double.parse(dummyResult).toString();
     });
+  }
+
+  changeTheme() {
+    iconText = isThemeBlack ? "Dark" : "Light";
+    setState(() => isThemeBlack = !isThemeBlack);
   }
 
   @override
@@ -75,7 +165,89 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
+      body: Container(
+          color: isThemeBlack ? Colors.black87 : Colors.white,
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.centerRight,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                child: Text(
+                  result,
+                  style: TextStyle(
+                      color: isThemeBlack ? Colors.white : Colors.black,
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                child: Text(
+                  history,
+                  style: TextStyle(
+                      color: isThemeBlack ? Colors.white54 : Colors.black45,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                  child: VerticalDivider(
+                color: isThemeBlack ? Colors.black45 : Colors.white,
+              )),
+              Column(
+                children: [
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      child: Row(children: [
+                        buildFunctionButton("AC", false),
+                        buildFunctionButton("+/-", false),
+                        buildFunctionButton("%", false),
+                        buildFunctionButton("/", true)
+                      ])),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      child: Row(children: [
+                        buildNumberButton("7"),
+                        buildNumberButton("8"),
+                        buildNumberButton("9"),
+                        buildFunctionButton("*", true)
+                      ])),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      child: Row(children: [
+                        buildNumberButton("4"),
+                        buildNumberButton("5"),
+                        buildNumberButton("6"),
+                        buildFunctionButton("-", true)
+                      ])),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      child: Row(children: [
+                        buildNumberButton("1"),
+                        buildNumberButton("2"),
+                        buildNumberButton("3"),
+                        buildFunctionButton("+", true)
+                      ])),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
+                      child: Row(children: <Widget>[
+                        Expanded(child: buildNumberButton("100")),
+                        buildNumberButton("."),
+                        buildFunctionButton("=", true)
+                      ]))
+                ],
+              )
+            ],
+          )),
+      /*Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
@@ -104,11 +276,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-      ),
+      ),*/
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () => changeTheme(),
         tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        child: Text(iconText),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
