@@ -58,16 +58,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget buildNumberButton(String text) {
     return Expanded(
+        flex: text == '0' ? 2 : 1,
         child: ElevatedButton(
+
             style: ElevatedButton.styleFrom(
+              alignment: text == '0' ? Alignment.centerLeft : Alignment.center,
               primary: isThemeBlack ? Colors.black26 : Colors.white,
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(25),
+              shape: text == '0'
+                  ? RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(50))
+                  : const CircleBorder(),
+              padding: text == '0'
+                  ? const EdgeInsets.fromLTRB(40, 25, 30, 25)
+                  : const EdgeInsets.all(25),
             ),
             onPressed: () => btnPressed(text),
             child: Text(text,
                 style: TextStyle(
                     fontSize: 26,
+
                     color: isThemeBlack ? Colors.white : Colors.black))));
   }
 
@@ -177,7 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   result,
                   style: TextStyle(
                       color: isThemeBlack ? Colors.white : Colors.black,
-                      fontSize: 40,
+                      fontSize: 60,
                       fontWeight: FontWeight.bold),
                 ),
               ),
@@ -238,8 +247,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 10),
-                      child: Row(children: <Widget>[
-                        Expanded(child: buildNumberButton("100")),
+                      child: Row(children: [
+                        buildNumberButton("0"),
                         buildNumberButton("."),
                         buildFunctionButton("=", true)
                       ]))
@@ -277,11 +286,20 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),*/
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => changeTheme(),
-        tooltip: 'Increment',
-        child: Text(iconText),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: Padding(
+          padding: const EdgeInsets.only(top: 100.0),
+          child: FloatingActionButton(
+            onPressed: () => changeTheme(),
+            tooltip: 'Increment',
+            backgroundColor: isThemeBlack ? Colors.white : Colors.black,
+            child: Text(iconText,
+              style: TextStyle(
+                  color: isThemeBlack ? Colors.black : Colors.white,
+                 ),
+            ),
+          )),
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .startTop, // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
