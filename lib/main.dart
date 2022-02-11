@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -13,18 +14,37 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      themeMode: ThemeMode.system,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
+      /*  brightness: Brightness.light,
+
         primarySwatch: Colors.blue,
+        primaryColor: Colors.white,
+
+        dividerColor: Colors.white54,
+        scaffoldBackgroundColor: Colors.white54,*/
+        /* light theme settings */
       ),
+
+
+      /* Dark theme settings */
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: Colors.black87,
+        brightness: Brightness.dark,
+        backgroundColor: Colors.green,
+        dividerColor: Colors.purple,
+        shadowColor: Colors.white38,
+        scaffoldBackgroundColor: Colors.blueGrey,
+
+        /* dark theme settings */
+      ),
+      /* ThemeMode.system to follow system theme,
+         ThemeMode.light for light theme,
+         ThemeMode.dark for dark theme
+      */
+      debugShowCheckedModeBanner: false,
+      
       home: const MyHomePage(title: 'Calculator App'),
     );
   }
@@ -50,7 +70,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String result = "0", history = "";
-  bool isThemeBlack = false;
+  var isThemeBlack ;
   String dummyResult = "0", operand = "";
   double value1 = 0.0, value2 = 0.0;
 
@@ -62,8 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: ElevatedButton(
 
             style: ElevatedButton.styleFrom(
+              elevation: 10,
               alignment: text == '0' ? Alignment.centerLeft : Alignment.center,
-              primary: isThemeBlack ? Colors.black26 : Colors.white,
+              primary: isThemeBlack == Brightness.dark  ? Colors.black : Colors.white,
               shape: text == '0'
                   ? RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50))
@@ -74,16 +95,16 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () => btnPressed(text),
             child: Text(text,
-                style: TextStyle(
+                style: TextStyle( 
                     fontSize: 26,
 
-                    color: isThemeBlack ? Colors.white : Colors.black))));
+                    color: isThemeBlack == Brightness.dark  ? Colors.white : Colors.black))));
   }
 
   Widget buildFunctionButton(String text, bool isDmas) {
     return Expanded(
         child: MaterialButton(
-            color: isThemeBlack ? Colors.black26 : Colors.white,
+            color: isThemeBlack == Brightness.dark  ? Colors.black26 : Colors.white,
             padding: const EdgeInsets.all(25),
             shape: const CircleBorder(),
             onPressed: () => btnPressed(text),
@@ -92,8 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     fontSize: 26,
                     color: isDmas
                         ? Colors.orangeAccent
-                        : isThemeBlack
-                            ? Colors.white60
+                        : isThemeBlack == Brightness.dark
+                        ? Colors.white60
                             : Colors.black26))));
   }
 
@@ -156,8 +177,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   changeTheme() {
-    iconText = isThemeBlack ? "Dark" : "Light";
-    setState(() => isThemeBlack = !isThemeBlack);
+    // iconText = isThemeBlack == Brightness.dark  ? "Dark" : "Light";
+    // setState(() => isThemeBlack = !isThemeBlack);
   }
 
   @override
@@ -168,6 +189,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    //isThemeBlack =MediaQuery.of(context).platformBrightness == Brightness.dark;
+    isThemeBlack =Theme.of(context).brightness;
+
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -175,7 +199,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-          color: isThemeBlack ? Colors.black87 : Colors.white,
+         // color: isThemeBlack == Brightness.dark ? Colors.black45 : Colors.white,
+          color: Theme.of(context).primaryColor,
           child: Column(
             children: [
               Container(
@@ -184,8 +209,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
                 child: Text(
                   result,
+                  maxLines: 1,
                   style: TextStyle(
-                      color: isThemeBlack ? Colors.white : Colors.black,
+                      color: isThemeBlack == Brightness.dark  ? Colors.white : Colors.black,
                       fontSize: 60,
                       fontWeight: FontWeight.bold),
                 ),
@@ -197,14 +223,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   history,
                   style: TextStyle(
-                      color: isThemeBlack ? Colors.white54 : Colors.black45,
+                      color: isThemeBlack == Brightness.dark  ? Colors.white54 : Colors.black45,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
                   child: VerticalDivider(
-                color: isThemeBlack ? Colors.black45 : Colors.white,
+                color: isThemeBlack == Brightness.dark  ? Colors.black45 : Colors.white,
               )),
               Column(
                 children: [
@@ -286,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),*/
-      floatingActionButton: Padding(
+     /* floatingActionButton: Padding(
           padding: const EdgeInsets.only(top: 100.0),
           child: FloatingActionButton(
             onPressed: () => changeTheme(),
@@ -299,7 +325,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           )),
       floatingActionButtonLocation: FloatingActionButtonLocation
-          .startTop, // This trailing comma makes auto-formatting nicer for build methods.
+          .startTop,*/
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
