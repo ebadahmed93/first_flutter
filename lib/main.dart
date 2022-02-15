@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'package:first_flutter/MultipleOperatorCalculator.dart';
 import 'package:flutter/material.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -16,16 +15,12 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       themeMode: ThemeMode.system,
       theme: ThemeData(
-      /*  brightness: Brightness.light,
-
+        brightness: Brightness.light,
         primarySwatch: Colors.blue,
         primaryColor: Colors.white,
-
         dividerColor: Colors.white54,
-        scaffoldBackgroundColor: Colors.white54,*/
-        /* light theme settings */
+        scaffoldBackgroundColor: Colors.white54,
       ),
-
 
       /* Dark theme settings */
       darkTheme: ThemeData(
@@ -44,7 +39,6 @@ class MyApp extends StatelessWidget {
          ThemeMode.dark for dark theme
       */
       debugShowCheckedModeBanner: false,
-      
       home: const MyHomePage(title: 'Calculator App'),
     );
   }
@@ -69,22 +63,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String result = "0", history = "";
-  var isThemeBlack ;
-  String dummyResult = "0", operand = "";
+  String result = "", history = "";
+  var isThemeBlack;
+
+  String dummyResult = "";
   double value1 = 0.0, value2 = 0.0;
 
   String iconText = "Dark";
+  bool isDecimalAdded = false;
 
   Widget buildNumberButton(String text) {
     return Expanded(
         flex: text == '0' ? 2 : 1,
         child: ElevatedButton(
-
             style: ElevatedButton.styleFrom(
               elevation: 10,
               alignment: text == '0' ? Alignment.centerLeft : Alignment.center,
-              primary: isThemeBlack == Brightness.dark  ? Colors.black : Colors.white,
+              primary:
+                  isThemeBlack == Brightness.dark ? Colors.black : Colors.white,
               shape: text == '0'
                   ? RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50))
@@ -95,16 +91,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onPressed: () => btnPressed(text),
             child: Text(text,
-                style: TextStyle( 
+                style: TextStyle(
                     fontSize: 26,
-
-                    color: isThemeBlack == Brightness.dark  ? Colors.white : Colors.black))));
+                    color: isThemeBlack == Brightness.dark
+                        ? Colors.white
+                        : Colors.black))));
   }
 
   Widget buildFunctionButton(String text, bool isDmas) {
     return Expanded(
         child: MaterialButton(
-            color: isThemeBlack == Brightness.dark  ? Colors.black26 : Colors.white,
+            color:
+                isThemeBlack == Brightness.dark ? Colors.black26 : Colors.white,
             padding: const EdgeInsets.all(25),
             shape: const CircleBorder(),
             onPressed: () => btnPressed(text),
@@ -114,71 +112,95 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: isDmas
                         ? Colors.orangeAccent
                         : isThemeBlack == Brightness.dark
-                        ? Colors.white60
+                            ? Colors.white60
                             : Colors.black26))));
   }
 
   btnPressed(String text) {
     if (text == "AC") {
-      dummyResult = "0";
-      value1 = value2 = 0.0;
-      operand = history = "";
+      dummyResult = "";
+      isDecimalAdded = false;
     } else if (text == "%") {
-      value1 = double.parse(result);
-      dummyResult = (value1 / 100).toString();
-      history = value1.toString() + "/100";
-      value1 = value2 = 0.0;
-      operand = "";
-    } else if (text == "+/-") {
-      value1 = double.parse(result);
-      dummyResult = (value1 * (-1)).toString();
-      history = value1.toString() + "*(-1)";
-      value1 = value2 = 0.0;
-      operand = "";
-    } else if (text == "/" || text == "*" || text == "-" || text == "+") {
-      value1 = double.parse(result);
-      operand = text;
-      dummyResult = "0";
-    } else if (text == ".") {
-      if (dummyResult.contains('.')) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Already contain a decimal"),
-        ));
+      if (dummyResult.contains("/") ||
+          dummyResult.contains("*") ||
+          dummyResult.contains("+") ||
+          dummyResult.contains("-")) {
+        showToast("First Evaluate the expression");
       } else {
-        dummyResult = dummyResult + text;
+        dummyResult = (double.parse(dummyResult) / 100).toString();
+      }
+    } else if (text == "+/-") {
+      if (dummyResult.contains("/") ||
+          dummyResult.contains("*") ||
+          dummyResult.contains("+")) {
+        showToast("First Evaluate the expression");
+      } else if (dummyResult.contains("-")) {
+        if (dummyResult.substring(1, dummyResult.length).contains("-")) {
+          showToast("First Evaluate the expression");
+        } else {
+          dummyResult = (double.parse(dummyResult) * (-1)).toString();
+        }
+      } else {
+        dummyResult = (double.parse(dummyResult) * (-1)).toString();
+      }
+    } else if (text == "/" || text == "*" || text == "-" || text == "+") {
+      if (dummyResult == "") {
+        showToast("Select value first");
+      } else {
+        var c = dummyResult.substring(dummyResult.length - 1);
+        if (c == '/' || c == '*' || c == '+' || c == '-' || c == '.') {
+          showToast("Select value first");
+        } else {
+          isDecimalAdded = false;
+          dummyResult += text;
+        }
+      }
+    } else if (text == ".") {
+      if (isDecimalAdded) {
+        showToast("Already contain a decimal");
+      } else {
+        isDecimalAdded = true;
+        dummyResult += text;
       }
     } else if (text == "=") {
-      value2 = double.parse(result);
-      if (operand == "/") {
-        dummyResult = (value1 / value2).toString();
-        history = value1.toString() + operand + value2.toString();
-      } else if (operand == "*") {
-        dummyResult = (value1 * value2).toString();
-        history = value1.toString() + operand + value2.toString();
-      } else if (operand == "-") {
-        dummyResult = (value1 - value2).toString();
-        history = value1.toString() + operand + value2.toString();
-      } else if (operand == "+") {
-        dummyResult = (value1 + value2).toString();
-        history = value1.toString() + operand + value2.toString();
+      if (dummyResult.isNotEmpty && dummyResult != "") {
+        var c = dummyResult.substring(dummyResult.length - 1);
+        if (c == '/' || c == '*' || c == '+' || c == '-' || c == '.') {
+          showToast("Enter Last value");
+        } else {
+          MultipleOperatorCalculator abc = MultipleOperatorCalculator();
+          print(dummyResult = abc.eval(dummyResult).toString());
+          isDecimalAdded = true;
+        }
+      } else {
+        showToast("Enter some value");
       }
-
-      value1 = value2 = 0.0;
-      operand = "";
     } else {
-      dummyResult = dummyResult + text;
+      // number
+      if (text == "0") {
+        if (dummyResult.isNotEmpty) {
+          if (dummyResult.contains("/") ||
+              dummyResult.contains("*") ||
+              dummyResult.contains("+") ||
+              dummyResult.contains("-")) {
+            dummyResult += text;
+          } else {
+            if (double.parse(dummyResult) < 1) {
+            } else {
+              dummyResult += text;
+            }
+          }
+        } else {
+          dummyResult += text;
+        }
+      } else {
+        dummyResult += text;
+      }
     }
-    if (kDebugMode) {
-      print(dummyResult);
-    }
-    setState(() {
-      result = double.parse(dummyResult).toString();
-    });
-  }
 
-  changeTheme() {
-    // iconText = isThemeBlack == Brightness.dark  ? "Dark" : "Light";
-    // setState(() => isThemeBlack = !isThemeBlack);
+    setState(() {
+      result = dummyResult;
+    });
   }
 
   @override
@@ -190,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     //isThemeBlack =MediaQuery.of(context).platformBrightness == Brightness.dark;
-    isThemeBlack =Theme.of(context).brightness;
+    isThemeBlack = Theme.of(context).brightness;
 
     return Scaffold(
       appBar: AppBar(
@@ -199,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Container(
-         // color: isThemeBlack == Brightness.dark ? Colors.black45 : Colors.white,
+          // color: isThemeBlack == Brightness.dark ? Colors.black45 : Colors.white,
           color: Theme.of(context).primaryColor,
           child: Column(
             children: [
@@ -211,7 +233,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   result,
                   maxLines: 1,
                   style: TextStyle(
-                      color: isThemeBlack == Brightness.dark  ? Colors.white : Colors.black,
+                      color: isThemeBlack == Brightness.dark
+                          ? Colors.white
+                          : Colors.black,
                       fontSize: 60,
                       fontWeight: FontWeight.bold),
                 ),
@@ -223,14 +247,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   history,
                   style: TextStyle(
-                      color: isThemeBlack == Brightness.dark  ? Colors.white54 : Colors.black45,
+                      color: isThemeBlack == Brightness.dark
+                          ? Colors.white54
+                          : Colors.black45,
                       fontSize: 20,
                       fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
                   child: VerticalDivider(
-                color: isThemeBlack == Brightness.dark  ? Colors.black45 : Colors.white,
+                color: isThemeBlack == Brightness.dark
+                    ? Colors.black45
+                    : Colors.white,
               )),
               Column(
                 children: [
@@ -312,7 +340,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),*/
-     /* floatingActionButton: Padding(
+      /* floatingActionButton: Padding(
           padding: const EdgeInsets.only(top: 100.0),
           child: FloatingActionButton(
             onPressed: () => changeTheme(),
@@ -328,5 +356,11 @@ class _MyHomePageState extends State<MyHomePage> {
           .startTop,*/
       // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  void showToast(String s) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(s),
+    ));
   }
 }
