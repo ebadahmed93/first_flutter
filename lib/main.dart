@@ -121,16 +121,33 @@ class _MyHomePageState extends State<MyHomePage> {
       dummyResult = "";
       isDecimalAdded = false;
     } else if (text == "%") {
-      if (dummyResult.contains("/") ||
+      /*if (dummyResult.contains("/") ||
           dummyResult.contains("*") ||
           dummyResult.contains("+") ||
           dummyResult.contains("-")) {
         showToast("First Evaluate the expression");
       } else {
         dummyResult = (double.parse(dummyResult) / 100).toString();
+      }*/
+
+      if (dummyResult == "") {
+        showToast("Select value first");
+      } else {
+        var c = dummyResult.substring(dummyResult.length - 1);
+        if (c == '/' ||
+            c == '*' ||
+            c == '+' ||
+            c == '-' ||
+            c == '.' ||
+            c == '%') {
+          showToast("Select value first");
+        } else {
+          isDecimalAdded = false;
+          dummyResult += text;
+        }
       }
     } else if (text == "+/-") {
-      if (dummyResult.contains("/") ||
+      /* if (dummyResult.contains("/") ||
           dummyResult.contains("*") ||
           dummyResult.contains("+")) {
         showToast("First Evaluate the expression");
@@ -142,7 +159,32 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       } else {
         dummyResult = (double.parse(dummyResult) * (-1)).toString();
-      }
+      }*/
+
+    /*  if (dummyResult == "") {
+        showToast("Select value first");
+      } else {
+        var c = dummyResult.substring(dummyResult.length - 1);
+        if (c == '/' ||
+            c == '*' ||
+            c == '+' ||
+            c == '-' ||
+            c == '.' ||
+            c == '%') {
+          showToast("Select value first");
+        } else {
+          isDecimalAdded = false;
+
+          for (int i = dummyResult.length - 1; i > 0; i--) {
+            var c = dummyResult.substring(i,1);
+            if (c == '/' || c == '*' || c == "+" || c == "-") {
+              return i;
+            }
+          }
+          return -1;
+          dummyResult += "*(-1)";
+        }
+      }*/
     } else if (text == "/" || text == "*" || text == "-" || text == "+") {
       if (dummyResult == "") {
         showToast("Select value first");
