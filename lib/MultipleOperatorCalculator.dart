@@ -11,11 +11,15 @@ class MultipleOperatorCalculator {
       str = str.replaceAll("%", "/100");
     }
 
-    if(str.contains("*(-1)")){
-      str = str.replaceAll("*(-1)", "*-1");
-    }
+   /* if(str.contains("(-")){
+      str = str.replaceAll("(-", "-(-");
+    }*/
 
+   /* if(str.contains(")")){
+      str = str.replaceAll(")", "");
+    }*/
 
+  print("value = "+str);
 
     ch =parse2();
 
@@ -43,12 +47,23 @@ class MultipleOperatorCalculator {
 
   double parseFactor() {
     if (eat('+')) return parseFactor(); // unary plus
-    if (eat('-')) return parseFactor(); // unary minus
+    //if (eat('-')) return parseFactor(); // unary minus
 
 
     double x = 0;
     int startPos = pos;
-    if (ch == '0' ||
+    if (eat('(')) { // parentheses
+      x = parseExpression();
+      if (!eat(')')) {
+        try {
+          throwException();
+        } on CustomException {
+          if (kDebugMode) {
+            print("Missing ')' ");
+          }
+        }
+      }
+    } else if (ch == '0' ||
     ch == '1' ||
     ch == '2' ||
     ch == '3' ||
@@ -74,7 +89,27 @@ class MultipleOperatorCalculator {
     nextChar();
     }
     x = double.parse(str.substring(startPos, pos));
-    } /*else if (ch >= 'a' && ch <= 'z') {
+    }else if(ch=='('){
+      while(ch == '('){
+        nextChar();
+      }
+      String func = str.substring(startPos, pos);
+      if (eat('(')) {
+        x = parseExpression();
+        if (!eat(')')) {
+          try {
+            throwException();
+          } on CustomException {
+            if (kDebugMode) {
+              print("Missing ')' after argument to " + func);
+            }
+          }
+        }
+      } else {
+        x = parseFactor();
+      }
+    }
+    /*else if (ch >= 'a' && ch <= 'z') {
         // functions
         while (ch >= 'a' && ch <= 'z') {
           nextChar();
@@ -83,7 +118,7 @@ class MultipleOperatorCalculator {
 
         x = parseFactor();
       }*/
-    print(x);
+    print("two time why"+x.toString());
     return x;
   }
 

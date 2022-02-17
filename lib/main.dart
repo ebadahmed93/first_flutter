@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
         dummyResult = (double.parse(dummyResult) * (-1)).toString();
       }*/
 
-    /*  if (dummyResult == "") {
+      if (dummyResult == "") {
         showToast("Select value first");
       } else {
         var c = dummyResult.substring(dummyResult.length - 1);
@@ -172,19 +172,30 @@ class _MyHomePageState extends State<MyHomePage> {
             c == '.' ||
             c == '%') {
           showToast("Select value first");
+        } else if (c == ')') {
+          dummyResult = dummyResult.substring(0, dummyResult.length - 1);
+          dummyResult =
+              dummyResult.replaceFirst("(-", "", dummyResult.lastIndexOf("(-"));
         } else {
           isDecimalAdded = false;
-
-          for (int i = dummyResult.length - 1; i > 0; i--) {
-            var c = dummyResult.substring(i,1);
+          bool isValueInverse = false;
+          for (int i = dummyResult.length - 1; i >= 0; i--) {
+            var c = dummyResult.substring(i, i + 1);
             if (c == '/' || c == '*' || c == "+" || c == "-") {
-              return i;
+              dummyResult = dummyResult.substring(0, i + 1) +
+                  "(-" +
+                  dummyResult.substring(i + 1, dummyResult.length) +
+                  ")";
+
+              isValueInverse = true;
+              break;
             }
           }
-          return -1;
-          dummyResult += "*(-1)";
+          if (!isValueInverse) {
+            dummyResult = "(-" + dummyResult + ")";
+          }
         }
-      }*/
+      }
     } else if (text == "/" || text == "*" || text == "-" || text == "+") {
       if (dummyResult == "") {
         showToast("Select value first");
@@ -219,7 +230,18 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     } else {
       // number
-      if (text == "0") {
+      if (text != "0") {
+        if (dummyResult.isNotEmpty) {
+          var c = dummyResult.substring(dummyResult.length - 1);
+          if (c == ')') {
+            showToast("Select operator");
+          }else{
+            dummyResult += text;
+          }
+        } else {
+          dummyResult += text;
+        }
+      } else {
         if (dummyResult.isNotEmpty) {
           if (dummyResult.contains("/") ||
               dummyResult.contains("*") ||
@@ -235,8 +257,6 @@ class _MyHomePageState extends State<MyHomePage> {
         } else {
           dummyResult += text;
         }
-      } else {
-        dummyResult += text;
       }
     }
 
@@ -278,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       color: isThemeBlack == Brightness.dark
                           ? Colors.white
                           : Colors.black,
-                      fontSize: 60,
+                      fontSize: 30,
                       fontWeight: FontWeight.bold),
                 ),
               ),
